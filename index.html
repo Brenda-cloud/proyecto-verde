@@ -1,12 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto Verde</title>
+    <title>ChojñaPacha</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+    <script>
+        const SUPABASE_URL = "https://meruzhshfyrdowxtwrhg.supabase.co";
+        const SUPABASE_ANON_KEY =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnV6aHNoZnlyZG93eHR3cmhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY3MzA0NTIsImV4cCI6MjAxMjMwNjQ1Mn0.JwUvNOUs5p07_v9OBn_xhu1hwtwUME9gaiiNgDJjH6E";
+
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous" />
+
 </head>
-<body>
-    <h1>Proyecto verde</h1>
-    
+
+<body class="bg-gradient-to-r from-violet-200 to-pink-200">
+    <div class="flex items-center justify-center h-screen flex-col">
+        <div>
+            <h1 class="text-5xl font-semibold text-gray-600">COMPOSTER 1</h1>
+        </div>
+        <div class=" py-24 sm:py-32">
+            <div class="mx-auto max-w-7xl px-6 lg:px-8">
+                <dl class="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-3">
+                    <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+                        <dt class="text-base leading-7 text-gray-600">Temperatura</dt>
+                        <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+                            <i class="fas fa-thermometer-half" style="color: #059e8a"></i>
+                            <span><span id="temp"></span> &deg;C</span>
+                        </dd>
+                    </div>
+                    <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+                        <dt class="text-base leading-7 text-gray-600">Humedad</dt>
+                        <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+                            <i class="fas fa-tint" style="color: #00add6"></i>
+                            <span><span id="hum"></span> &percnt;</span>
+                        </dd>
+                    </div>
+                    <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+                        <dt class="text-base leading-7 text-gray-600">Estado</dt>
+                        <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+                            <i class="fa fa-check" aria-hidden="true"  style="color: #2dce7dbe"></i>
+
+                            Activo
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </div>
+   
+
+
+
+
+
+    <script>
+        async function obtenerDatos() {
+            try {
+                const { data, error } = await _supabase
+                    .from('datos_recolectados')
+                    .select()
+                let temperatura = ''
+                let humedad = ''
+                data.forEach(function (item) {
+                    temperatura = item.temperatura
+                    humedad = item.humedad
+                    console.log(data)
+                })
+               
+                document.getElementById('temp').innerHTML = temperatura.toFixed(2)
+                document.getElementById('hum').innerHTML = humedad
+            }
+            catch (err) {
+                console.error("Error al recibir los datos de la db", err);
+            }
+            console.log(data);
+        };
+        
+
+        async function subscribeSensor() {
+            const mySubscription = _supabase
+                .channel('*')
+                .on('*', (payload) => {
+                    obtenerDatos();
+                    console.log('¡Recibiendo cambios!', payload)
+                })
+                .subscribe()
+            obtenerDatos();
+        }
+        subscribeSensor();
+
+    </script>
+
+
+<script>
+    class HttpSourceRestJsonGet {
+    async init() {
+        this.axiosClient = yepcode.integration.http("your-http-credential-name");
+    }
+
+    async fetch(publish, done) {
+        // TODO: Customize the path to the API call
+        await this.axiosClient
+            .get("/the-get-rest-api-path", {
+                params: {
+                    // TODO: Provide optional HTTP parameters
+                },
+            })
+            .then(async ({
+                data
+            }) => {
+                // Publish each JSON object in array
+                for (const item of data) {
+                    await publish(item);
+                }
+            });
+        done();
+    }
+
+    async close() {}
+}
+</script>
 </body>
+
 </html>
