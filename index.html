@@ -6,129 +6,96 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChojñaPacha</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <!-- bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
-    <script>
-        const SUPABASE_URL = "https://meruzhshfyrdowxtwrhg.supabase.co";
-        const SUPABASE_ANON_KEY =
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnV6aHNoZnlyZG93eHR3cmhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY3MzA0NTIsImV4cCI6MjAxMjMwNjQ1Mn0.JwUvNOUs5p07_v9OBn_xhu1hwtwUME9gaiiNgDJjH6E";
 
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    </script>
+    <!-- chartJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js"></script>
 
+    <!-- iconos -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
         integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous" />
 
 </head>
 
-<body class="bg-gradient-to-r from-violet-200 to-pink-200">
-    <div class="flex items-center justify-center h-screen flex-col">
+<body class="">
+    <div class="container py-2 " >
         <div>
-            <h1 class="text-5xl font-semibold text-gray-600">Compostador</h1>
+            <h1 class="text-center  text-success">COMPOSTERA</h1>
         </div>
-        <div class=" py-24 sm:py-32">
-            <div class="mx-auto max-w-7xl px-6 lg:px-8">
-                <dl class="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-3">
-                    <div class="mx-auto flex max-w-xs flex-col gap-y-4">
-                        <dt class="text-base leading-7 text-gray-600">Temperatura</dt>
-                        <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
-                            <i class="fas fa-thermometer-half" style="color: #059e8a"></i>
-                            <span><span id="temp"></span> &deg;C</span>
-                        </dd>
+        <div class=" ">
+            <div class="">
+                <div class="row gap-5 text-center m-5  justify-content-md-center" ">
+                    <div class="card mb-3 " style="width: 18rem;">
+                        <div class="card-body">
+                            <dt class="card-title">Temperatura</dt>
+                            <dd class="">
+                                <i class=""></i>
+                                <span><span id="temp"></span> &deg;C</span>
+                            </dd>
+                        </div>
                     </div>
-                    <div class="mx-auto flex max-w-xs flex-col gap-y-4">
-                        <dt class="text-base leading-7 text-gray-600">Humedad</dt>
-                        <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+                    <div class="card mb-3" style="width: 18rem;">
+                       <div class="card-body">
+                        <dt class="">Humedad</dt>
+                        <dd class="">
                             <i class="fas fa-tint" style="color: #00add6"></i>
                             <span><span id="hum"></span> &percnt;</span>
                         </dd>
+                       </div>
                     </div>
-                    <div class="mx-auto flex max-w-xs flex-col gap-y-4">
-                        <dt class="text-base leading-7 text-gray-600">Estado</dt>
-                        <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
-                            <i class="fa fa-check" aria-hidden="true"  style="color: #2dce7dbe"></i>
+                    <div class="card mb-3" style="width: 18rem;">
+                        <div class="card-body">
+                            <dt class="">Hora de Medicion</dt>
+                        <dd class="">
+                            <!-- <i class="fa fa-check" aria-hidden="true" style="color: #2dce7dbe"></i> -->
 
-                            Activo
+                            <span id="fecha"></span>
                         </dd>
+                        </div>
                     </div>
-                </dl>
+                </div>
             </div>
         </div>
     </div>
-   
-
-
-
-
-
-    <script>
-        async function obtenerDatos() {
-            try {
-                const { data, error } = await _supabase
-                    .from('datos_recolectados')
-                    .select()
-                let temperatura = ''
-                let humedad = ''
-                data.forEach(function (item) {
-                    temperatura = item.temperatura
-                    humedad = item.humedad
-                    console.log(data)
-                })
+    <div class="container">
+        <div class="">
+            <h3>composteras </h3>
+            <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Id</th>
+                    <th scope="col">Id Org</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Capacidad</th>
+                    <th scope="col">Ubicacion</th>
+                    <th scope="col">Fecha Instalacion</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Comentarios</th>
+                  </tr>
+                </thead>
+                <tbody class="table-group-divider" id="composteras">
+                  <tr>
+                    <th scope="row">1</th>
+                    <td>Mark</td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                  </tr>
                
-                document.getElementById('temp').innerHTML = temperatura.toFixed(2)
-                document.getElementById('hum').innerHTML = humedad
-            }
-            catch (err) {
-                console.error("Error al recibir los datos de la db", err);
-            }
-            console.log(data);
-        };
-        
+                </tbody>
+              </table>
 
-        async function subscribeSensor() {
-            const mySubscription = _supabase
-                .channel('*')
-                .on('*', (payload) => {
-                    obtenerDatos();
-                    console.log('¡Recibiendo cambios!', payload)
-                })
-                .subscribe()
-            obtenerDatos();
-        }
-        subscribeSensor();
+        </div>
+        <div>
+            <canvas id="line-chart" width="800" height="450"></canvas>
+        </div>
+    </div>
 
-    </script>
-
-
-<script>
-    class HttpSourceRestJsonGet {
-    async init() {
-        this.axiosClient = yepcode.integration.http("your-http-credential-name");
-    }
-
-    async fetch(publish, done) {
-        // TODO: Customize the path to the API call
-        await this.axiosClient
-            .get("/the-get-rest-api-path", {
-                params: {
-                    // TODO: Provide optional HTTP parameters
-                },
-            })
-            .then(async ({
-                data
-            }) => {
-                // Publish each JSON object in array
-                for (const item of data) {
-                    await publish(item);
-                }
-            });
-        done();
-    }
-
-    async close() {}
-}
-</script>
+    <script src="fecth.js"></script>
 </body>
 
 </html>
