@@ -12,16 +12,21 @@ export const ProductsPage = lazy(() => import('src/pages/composteras'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 // ----------------------------------------------------------------------
-
 export default function Router() {
+  const data = localStorage.getItem('user');
+  const isAuthenticated = data !== null;
+  console.log(isAuthenticated);
+
   const routes = useRoutes([
     {
-      element: (
+      element: isAuthenticated ? (
         <DashboardLayout>
           <Suspense>
             <Outlet />
           </Suspense>
         </DashboardLayout>
+      ) : (
+        <Navigate to="/login" />
       ),
       children: [
         { element: <IndexPage />, index: true },
@@ -34,7 +39,7 @@ export default function Router() {
     },
     {
       path: 'login',
-      element: <LoginPage />,
+      element: isAuthenticated ? <Navigate to="/" /> : <LoginPage />,
     },
     {
       path: '404',
@@ -42,9 +47,51 @@ export default function Router() {
     },
     {
       path: '*',
-      element: <Navigate to="/404" replace />,
+      element: <Navigate to="/404" />,
     },
   ]);
 
   return routes;
 }
+
+// ----------------------------------------------------------------------
+
+// export default function Router() {
+//   const data = localStorage.getItem('user');
+//   console.log(data);
+
+
+//   const routes = useRoutes([
+//     {
+//       element: (
+//         <DashboardLayout>
+//           <Suspense>
+//             <Outlet />
+//           </Suspense>
+//         </DashboardLayout>
+//       ),
+//       children: [
+//         { element: <IndexPage />, index: true },
+//         { path: 'user', element: <UserPage /> },
+//         { path: 'composteras', element: <ProductsPage /> },
+//         { path: 'blog', element: <BlogPage /> },
+//         { path: 'compostera', element: <Compostera /> },
+//         { path: '/compostera/:id', element: <Compostera /> },
+//       ],
+//     },
+//     {
+//       path: 'login',
+//       element: <LoginPage />,
+//     },
+//     {
+//       path: '404',
+//       element: <Page404 />,
+//     },
+//     {
+//       path: '*',
+//       element: <Navigate to="/404" replace />,
+//     },
+//   ]);
+
+//   return routes;
+// }
