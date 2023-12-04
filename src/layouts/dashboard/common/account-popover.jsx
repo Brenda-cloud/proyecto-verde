@@ -8,37 +8,44 @@ import { alpha } from '@mui/material/styles';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
-
+import { useRouter } from 'src/routes/hooks';
 import { account } from 'src/_mock/account';
 
 // ----------------------------------------------------------------------
 
 const MENU_OPTIONS = [
-  {
-    label: 'Inicio',
-    icon: 'eva:home-fill',
-  },
-  {
-    label: 'Perfil',
-    icon: 'eva:person-fill',
-  },
-  {
-    label: 'Ajustes',
-    icon: 'eva:settings-2-fill',
-  },
+  // {
+  //   label: 'Inicios',
+  //   icon: 'eva:home-fill',
+  // },
+  // {
+  //   label: 'Perfil',
+  //   icon: 'eva:person-fill',
+  // },
+  // {
+  //   label: 'Ajustes',
+  //   icon: 'eva:settings-2-fill',
+  // },
 ];
 
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
-
+  const router = useRouter();
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
   };
 
   const handleClose = () => {
     setOpen(null);
+  };
+
+  const handleCerrarSeccion = () => {
+    localStorage.removeItem('user');
+
+  // Redireccionamos al usuario a la página de inicio de sesión
+    router.push('/login');
   };
 
   return (
@@ -94,18 +101,18 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        {MENU_OPTIONS.map((option) => (
+        {/* {MENU_OPTIONS.map((option) => (
           <MenuItem key={option.label} onClick={handleClose}>
             {option.label}
           </MenuItem>
-        ))}
+        ))} */}
 
         <Divider sx={{ borderStyle: 'dashed', m: 0 }} />
 
         <MenuItem
           disableRipple
           disableTouchRipple
-          onClick={handleClose}
+          onClick={handleCerrarSeccion}
           sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
         >
           Cerrar sesión
