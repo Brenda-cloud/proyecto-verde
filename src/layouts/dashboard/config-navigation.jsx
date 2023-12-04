@@ -14,19 +14,20 @@ const navConfig = [
   },
   {
     title: 'Composteras',
-    path: '/user',
-    icon: icon('ic_user'),
-  },
-  {
-    title: 'Estadisticas',
-    path: '/products',
+    path: '/composteras',
     icon: icon('ic_cart'),
   },
-  {
-    title: 'mas...',
-    path: '/blog',
-    icon: icon('ic_blog'),
-  },
+  // {
+  //   title: 'Composteras',
+  //   path: '/user',
+  //   icon: icon('ic_user'),
+  // },
+
+  // {
+  //   title: 'mas...',
+  //   path: '/blog',
+  //   icon: icon('ic_blog'),
+  // },
   // {
   //   title: 'login',
   //   path: '/login',

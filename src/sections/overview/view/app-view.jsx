@@ -1,3 +1,12 @@
+// ----------------------------------------------------------------------
+import { useState, useEffect } from 'react';
+import { supabase } from 'src/supabase/supabaseClient';
+
+// ----------------------------------------------------------------------
+import { FaMicrochip } from 'react-icons/fa';
+import { MdCompost, MdOutlineNearbyError } from 'react-icons/md';
+import { GiAutoRepair } from 'react-icons/gi';
+
 import { faker } from '@faker-js/faker';
 
 import Container from '@mui/material/Container';
@@ -16,9 +25,194 @@ import AppTrafficBySite from '../app-traffic-by-site';
 import AppCurrentSubject from '../app-current-subject';
 import AppConversionRates from '../app-conversion-rates';
 
-// ----------------------------------------------------------------------
-
 export default function AppView() {
+  const [numCompostadores, setNumCompostadores] = useState(0);
+  const [numCompostadoresInactivos, setNumCompostadoresInactivos] = useState(0);
+  const [numCompostadoresEnReparacion, setNumCompostadoresEnReparacion] = useState(0);
+  const [numEquipos, setNumEquipos] = useState(0);
+
+  const [datosRecolectadosSemana, setDatosRecolectadosSemana] = useState([]);
+
+  useEffect(() => {
+    fetchComposteras();
+    fetchEquipos();
+    fetchCompostadoresEnReparacion();
+    fetchCompostadoresInactivos();
+    fetchDatosRecolectadosSemana();
+    // Agrega más llamadas a funciones de recuento según sea necesario
+  }, []);
+  console.log(datosRecolectadosSemana);
+
+  async function fetchComposteras() {
+    try {
+      const { data, error } = await supabase.from('compostadores').select('idcomp');
+
+      if (error) {
+        console.error('Error al obtener compostadores', error);
+        return;
+      }
+
+      setNumCompostadores(data.length);
+    } catch (error) {
+      console.error('Error en la operación', error);
+    }
+  }
+  async function fetchCompostadoresInactivos() {
+    try {
+      const { data, error } = await supabase
+        .from('compostadores')
+        .select('idcomp')
+        .eq('estado', 'inactivo'); // Filtra por compostadores inactivos
+
+      if (error) {
+        console.error('Error al obtener compostadores inactivos', error);
+        return;
+      }
+
+      setNumCompostadoresInactivos(data.length);
+    } catch (error) {
+      console.error('Error en la operación', error);
+    }
+  }
+  async function fetchCompostadoresEnReparacion() {
+    try {
+      const { data, error } = await supabase
+        .from('compostadores')
+        .select('idcomp')
+        .eq('estado', 'reparacion'); // Filtra por compostadores en reparación
+
+      if (error) {
+        console.error('Error al obtener compostadores en reparación', error);
+        return;
+      }
+
+      setNumCompostadoresEnReparacion(data.length);
+    } catch (error) {
+      console.error('Error en la operación', error);
+    }
+  }
+
+  async function fetchEquipos() {
+    try {
+      const { data, error } = await supabase.from('equipo').select('ideq');
+
+      if (error) {
+        console.error('Error al obtener equipos', error);
+        return;
+      }
+
+      setNumEquipos(data.length);
+    } catch (error) {
+      console.error('Error en la operación', error);
+    }
+  }
+
+  // -------------------------------------------------------------------------------------------
+  async function fetchDatosRecolectadosSemana() {
+    try {
+      // Obtén la fecha de inicio de la semana actual
+      const today = new Date();
+      const startOfWeek = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate() - today.getDay()
+      );
+
+      // Formatea la fecha al formato de Supabase (YYYY-MM-DD)
+      const formattedStartDate = startOfWeek.toISOString().split('T')[0];
+
+      // Realiza la consulta a Supabase con filtro de fecha
+      const { data, error } = await supabase
+        .from('datos_recolectados')
+        .select('*')
+        .gte('fecha', formattedStartDate); // Filtra para obtener datos desde el inicio de la semana
+
+      if (error) {
+        console.error('Error al obtener datos recolectados de la semana', error);
+        return;
+      }
+
+      // Aquí deberías procesar los datos según tus necesidades
+      setDatosRecolectadosSemana(data);
+    } catch (error) {
+      console.error('Error en la operación', error);
+    }
+  }
+
+  function getFechasSemana(startOfWeek) {
+    const fechasSemana = [];
+    for (let i = 0; i < 7; i += 1) {
+      const fecha = new Date(startOfWeek);
+      fecha.setDate(startOfWeek.getDate() + i);
+      fechasSemana.push(fecha.toISOString().split('T')[0]);
+    }
+    return fechasSemana;
+  }
+
+  const today = new Date();
+  const startOfWeek = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() - ((today.getDay() + 6) % 7)
+  );
+  const fechasSemana = getFechasSemana(startOfWeek);
+  // console.log('Fechas de la semana:', fechasSemana);
+
+  const datosPorDia = {
+    1: { temperaturaTotal: 0, humedadTotal: 0, count: 0 }, // Lunes
+    2: { temperaturaTotal: 0, humedadTotal: 0, count: 0 }, // Martes
+    3: { temperaturaTotal: 0, humedadTotal: 0, count: 0 }, // Miércoles
+    4: { temperaturaTotal: 0, humedadTotal: 0, count: 0 }, // Jueves
+    5: { temperaturaTotal: 0, humedadTotal: 0, count: 0 }, // Viernes
+    6: { temperaturaTotal: 0, humedadTotal: 0, count: 0 }, // Sábado
+    0: { temperaturaTotal: 0, humedadTotal: 0, count: 0 }, // Domingo
+  };
+
+  datosRecolectadosSemana.forEach((dato) => {
+    const fecha = new Date(dato.fecha);
+    const diaDeLaSemana = (fecha.getDay() + 6) % 7; // Ajuste para comenzar en lunes
+
+    datosPorDia[diaDeLaSemana].temperaturaTotal += dato.temperatura;
+    datosPorDia[diaDeLaSemana].humedadTotal += dato.humedad;
+    datosPorDia[diaDeLaSemana].count += 1;
+  });
+
+  const promediosPorDia = {
+    temperatura: Array.from({ length: 7 }, (_, index) => {
+      const count = datosPorDia[index].count || 1;
+      return datosPorDia[index].temperaturaTotal / count;
+    }),
+    humedad: Array.from({ length: 7 }, (_, index) => {
+      const count = datosPorDia[index].count || 1;
+      return datosPorDia[index].humedadTotal / count;
+    }),
+  };
+
+  console.log(promediosPorDia);
+
+  const fechasEspañol = [];
+  const temperaturas = [];
+  const humedades = [];
+
+  datosRecolectadosSemana.forEach(({ fecha, temperatura, humedad }) => {
+    const fechaObj = new Date(fecha);
+
+    if (!Number.isNaN(fechaObj)) {
+      // fechasEspañol.push(fechaObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }));
+      fechasEspañol.push(fecha);
+      temperaturas.push(temperatura);
+      humedades.push(humedad);
+    } else {
+      console.error(`Fecha no válida: ${fecha}`);
+    }
+  });
+
+  console.log('Fechas en Español:', fechasEspañol);
+  console.log('Temperaturas:', temperaturas);
+  console.log('Humedades:', humedades);
+
+  // -------------------------------------------------------------------------------------------
+
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" sx={{ mb: 5 }}>
@@ -26,88 +220,89 @@ export default function AppView() {
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid xs={12} sm={6} md={3}>
+        <Grid key={1} xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Ventas semanales"
-            total={714000}
+            title="Cantidad de equipos"
+            total={numEquipos !== null ? numEquipos : '0'}
             color="success"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
+            // icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
+            icon={<FaMicrochip size={50} color="black" />}
           />
         </Grid>
-
-        <Grid xs={12} sm={6} md={3}>
+        <Grid key={2} xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="New Users"
-            total={1352831}
-            color="info"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
+            title="Cantidad de composteras"
+            total={numCompostadores !== null ? numCompostadores : '0'}
+            color="success"
+            icon={<MdCompost size={50} color="green" />}
           />
         </Grid>
 
-        <Grid xs={12} sm={6} md={3}>
+        <Grid key={3} xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Item Orders"
-            total={1723315}
-            color="warning"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
+            title="Composteras en reparacion"
+            total={numCompostadoresEnReparacion == null ? numCompostadoresEnReparacion : '0'}
+            color="success"
+            icon={<GiAutoRepair size={50} color="blue" />}
           />
         </Grid>
-
-        <Grid xs={12} sm={6} md={3}>
+        <Grid key={4} xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Bug Reports"
-            total={234}
-            color="error"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
+            title="Composteras inactivas"
+            total={numCompostadoresInactivos == null ? numCompostadoresInactivos : '0'}
+            color="success"
+            icon={<MdOutlineNearbyError size={50} color="red" />}
           />
         </Grid>
 
-
-    {/* asta aqui las cards */}
+        {/* asta aqui las cards */}
 
         <Grid xs={12} md={6} lg={8}>
           <AppWebsiteVisits
-            title="Website Visits"
-            subheader="(+43%) than last year"
+            title="Temperatura semanal"
+            subheader="Esta semana"
             chart={{
-              labels: [
-                '01/01/2003',
-                '02/01/2003',
-                '03/01/2003',
-                '04/01/2003',
-                '05/01/2003',
-                '06/01/2003',
-                '07/01/2003',
-                '08/01/2003',
-                '09/01/2003',
-                '10/01/2003',
-                '11/01/2003',
-              ],
+              labels: fechasEspañol,
               series: [
+                // {
+                //   name: 'Team A',
+                //   type: 'column',
+                //   fill: 'gradient',
+                //   data: temperaturas,
+                // },
                 {
-                  name: 'Team A',
-                  type: 'column',
-                  fill: 'solid',
-                  data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30],
-                },
-                {
-                  name: 'Team B',
+                  name: 'Humedad',
                   type: 'area',
                   fill: 'gradient',
-                  data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43],
+                  data: humedades,
                 },
                 {
-                  name: 'Team C',
+                  name: 'Temperatura',
                   type: 'line',
-                  fill: 'solid',
-                  data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39],
+                  fill: 'gradient',
+                  data: temperaturas,
                 },
               ],
             }}
           />
         </Grid>
-
+        {console.log(fechasSemana)}  
+            {console.log(temperaturas)}
         <Grid xs={12} md={6} lg={4}>
+          <AppCurrentSubject
+            title="Medición Semanal"
+            chart={{
+              categories: fechasSemana,
+              series: [
+                { name: 'Temperatura', data: promediosPorDia.temperatura },
+                { name: 'Humedad', data: promediosPorDia.humedad },
+              ],
+            }}
+            />
+        </Grid>
+            
+
+        {/* <Grid xs={12} md={6} lg={4}>
           <AppCurrentVisits
             title="Current Visits"
             chart={{
@@ -140,22 +335,9 @@ export default function AppView() {
               ],
             }}
           />
-        </Grid>
+        </Grid> */}
 
-        <Grid xs={12} md={6} lg={4}>
-          <AppCurrentSubject
-            title="Current Subject"
-            chart={{
-              categories: ['English', 'History', 'Physics', 'Geography', 'Chinese', 'Math'],
-              series: [
-                { name: 'Series 1', data: [80, 50, 30, 40, 100, 20] },
-                { name: 'Series 2', data: [20, 30, 40, 80, 20, 80] },
-                { name: 'Series 3', data: [44, 76, 78, 13, 43, 10] },
-              ],
-            }}
-          />
-        </Grid>
-
+        {/* 
         <Grid xs={12} md={6} lg={8}>
           <AppNewsUpdate
             title="Actualización de las noticias"
@@ -185,9 +367,9 @@ export default function AppView() {
               time: faker.date.past(),
             }))}
           />
-        </Grid>
+        </Grid> */}
 
-        <Grid xs={12} md={6} lg={4}>
+        {/* <Grid xs={12} md={6} lg={12}>
           <AppTrafficBySite
             title="Traffic by Site"
             list={[
@@ -213,9 +395,9 @@ export default function AppView() {
               },
             ]}
           />
-        </Grid>
+        </Grid> */}
 
-        <Grid xs={12} md={6} lg={8}>
+        {/* <Grid xs={12} md={6} lg={8}>
           <AppTasks
             title="Tasks"
             list={[
@@ -226,7 +408,7 @@ export default function AppView() {
               { id: '5', name: 'Sprint Showcase' },
             ]}
           />
-        </Grid>
+        </Grid> */}
       </Grid>
     </Container>
   );

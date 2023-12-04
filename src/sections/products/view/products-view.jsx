@@ -1,36 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from 'src/supabase/supabaseClient';
 
-import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
-import { products } from 'src/_mock/products';
-
 import ProductCard from '../product-card';
-import ProductSort from '../product-sort';
-import ProductFilters from '../product-filters';
-import ProductCartWidget from '../product-cart-widget';
+
 
 // ----------------------------------------------------------------------
 
 export default function ProductsView() {
-  const [openFilter, setOpenFilter] = useState(false);
+  const [comp_dato_rec, setCompostadores] = useState([]);
 
-  const handleOpenFilter = () => {
-    setOpenFilter(true);
-  };
+  useEffect(() => {   
+    fetchCompostadores();
+  }, []);
+  async function fetchCompostadores() {
+    try {
+      const { data } = await supabase.rpc('obtener_datos_recolectados') ;   
+      // const { data } = await supabase.rpc('obtener_datos_recolectados').eq("idcomp",1) ;   
+      setCompostadores(data);
+    } catch (error) {
+      console.error('Error en la operación:', error.message);
+    }
+  }
 
-  const handleCloseFilter = () => {
-    setOpenFilter(false);
-  };
+  
 
+  console.log(comp_dato_rec);
+  
   return (
     <Container>
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Productos
+        COMPOSTERAS
       </Typography>
-
+      {/* 
       <Stack
         direction="row"
         alignItems="center"
@@ -47,17 +52,23 @@ export default function ProductsView() {
 
           <ProductSort />
         </Stack>
-      </Stack>
+      </Stack> */}
 
       <Grid container spacing={3}>
-        {products.map((product) => (
+        {/* {products.map((product) => (
           <Grid key={product.id} xs={12} sm={6} md={3}>
             <ProductCard product={product} />
+          </Grid>
+        ))} */}
+        {/* {console.log(comp_dato_rec)} */}
+        {comp_dato_rec.map((compostera) => (
+          <Grid key={compostera.iddat} xs={12} sm={6} md={3}>
+            <ProductCard compostadores={compostera} id={compostera.idcomp} />
           </Grid>
         ))}
       </Grid>
 
-      <ProductCartWidget />
+      {/* <ProductCartWidget /> */}
     </Container>
   );
 }
