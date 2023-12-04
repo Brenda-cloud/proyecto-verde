@@ -19,10 +19,10 @@
 
 const data = localStorage.getItem('user');
 let dataJS = {
-  id: '100',
-  username: 'None',
+  id: '10000009',
+  username: 'Administrador',
   avatar_url: 'abc.noHay',
-  email: 'nohay@no.com',
+  email: 'Admin@gmail.com',
 };
 if (data) {
   dataJS = JSON.parse(data);

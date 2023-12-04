@@ -1,3 +1,3 @@
-## Minimal ChojÑa Pacha
+## ChojÑa Pacha
 
 
