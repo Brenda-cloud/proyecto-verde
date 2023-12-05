@@ -51,6 +51,7 @@ subscribeSensor();
 function formatearFechaEnEspanol(fecha) {
   // Convierte la cadena de fecha a un objeto Date
   const fechaObjeto = new Date(fecha);
+  fechaObjeto.setHours(fechaObjeto.getHours() - 4);
 
   // Obtiene las partes de la fecha (día, mes, año, etc.) en español
   const opciones = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false };
