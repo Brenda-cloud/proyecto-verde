@@ -6,16 +6,21 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 async function obtenerDatos() {
   try {
-    const { data, error } = await _supabase.from("datos_recolectados").select();
+    const { data, error } = await _supabase.from("datos_recolectados").select().order("fecha", { ascending: false }) // Ordena por fecha en orden descendente
+    .limit(1); // Limita los resultados a 1;
+console.log(data);
+
     let temperatura = "";
     let humedad = "";
+    let fecha = "";
     data.forEach(function (item) {
       temperatura = item.temperatura;
       humedad = item.humedad;
-      // fecha = item.
-      // console.log(data)
+      fecha = item.fecha;
+      console.log(data)
     });
-
+    const fechaFormateada = formatearFechaEnEspanol(fecha);
+    document.getElementById("fh").innerHTML = fechaFormateada;
     document.getElementById("temp").innerHTML = temperatura.toFixed(2);
     document.getElementById("hum").innerHTML = humedad;
   } catch (err) {
@@ -42,6 +47,17 @@ async function subscribeSensor() {
   obtenerDatos();
 }
 subscribeSensor();
+
+function formatearFechaEnEspanol(fecha) {
+  // Convierte la cadena de fecha a un objeto Date
+  const fechaObjeto = new Date(fecha);
+
+  // Obtiene las partes de la fecha (día, mes, año, etc.) en español
+  const opciones = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false };
+  const fechaFormateada = fechaObjeto.toLocaleString('es-ES', opciones);
+
+  return fechaFormateada;
+}
 
 
 // window.addEventListener("load", function (event) {
